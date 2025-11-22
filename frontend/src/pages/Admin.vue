@@ -326,24 +326,33 @@ export default {
 
 .sidebar button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   text-align: left;
   border: none;
-  background: none;
+  background-color: #ffffff;
+  color: #34495e;
   cursor: pointer;
-  font-size: 14px;
-  border-radius: 4px;
-  transition: all 0.2s;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar button:hover {
-  background-color: #e0e0e0;
+  background-color: #f8f9fa;
+  color: #3498db;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar button.active {
   background: linear-gradient(135deg, #3498db, #64b5f6);
   color: white;
-  box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
+  font-weight: 600;
+  padding: 14px;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+  transform: translateY(-1px);
 }
 
 /* 内容区域 */
