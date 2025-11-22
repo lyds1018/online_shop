@@ -35,17 +35,24 @@ export const formatPrice = (price) => {
 
 /**
  * 获取图片 URL
- * @param {string} imgFileName - 图片文件名
+ * @param {string} imgFileName - 图片文件名或URL
  * @returns {string} 图片 URL
  */
 export const getImageUrl = (imgFileName) => {
   if (!imgFileName) return null
-  try {
-    return require(`@/img/${imgFileName}`)
-  } catch (error) {
-    console.warn('图片加载失败:', imgFileName)
-    return `/src/img/${imgFileName}`
+  
+  // 如果已经是完整URL，直接返回
+  if (imgFileName.startsWith('http://') || imgFileName.startsWith('https://')) {
+    return imgFileName
   }
+  
+  // 如果是相对路径（以/api/开头），拼接后端地址
+  if (imgFileName.startsWith('/api/')) {
+    return `http://localhost:8080${imgFileName}`
+  }
+  
+  // 否则假定是文件名，拼接完整路径
+  return `http://localhost:8080/api/files/images/${imgFileName}`
 }
 
 /**

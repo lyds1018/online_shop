@@ -26,11 +26,12 @@ public class WebConfig implements WebMvcConfigurer {
         // 1. 普通用户认证拦截器
         // 拦截所有 /api/** 的请求，确保用户已登录
         registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/api/**");
+                .addPathPatterns("/api/**")
+                .excludePathPatterns("/api/files/images/**");  // 图片访问无需认证
         
         // 2. 管理员认证拦截器
-        // 拦截所有 /api/admin/** 的请求，确保用户是管理员
+        // 拦截所有 /api/admin/** 和 /api/files/upload 的请求，确保用户是管理员
         registry.addInterceptor(adminAuthInterceptor)
-                .addPathPatterns("/api/admin/**");
+                .addPathPatterns("/api/admin/**", "/api/files/upload");
     }
 }

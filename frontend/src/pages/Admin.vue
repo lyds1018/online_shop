@@ -128,17 +128,28 @@
 
           <div class="form-group">
             <label>商品图片：</label>
-            <div class="image-selector">
-              <div 
-                v-for="img in imgFiles" 
-                :key="img" 
-                class="image-option"
-                :class="{ selected: productForm.imageUrl === img }"
-                @click="selectImage(img)"
-              >
-                <img :src="getImageUrl(img)" alt="图片预览" style="width: 60px; height: 60px; object-fit: cover;">
-                <span>{{ productForm.imageUrl === img ? '已选择' : img }}</span>
+            <div class="image-upload">
+              <!-- 图片预览 -->
+              <div v-if="productForm.imgUrl" class="image-preview">
+                <img :src="getImageUrl(productForm.imgUrl)" alt="商品图片">
+                <button type="button" class="remove-image" @click="removeImage">×</button>
               </div>
+              <!-- 上传按钮 -->
+              <div v-else class="upload-placeholder">
+                <input 
+                  type="file" 
+                  ref="fileInput" 
+                  @change="handleFileChange" 
+                  accept="image/*"
+                  style="display: none;"
+                />
+                <button type="button" class="upload-btn" @click="$refs.fileInput.click()">
+                  <span class="upload-icon">📷</span>
+                  <span>点击上传图片</span>
+                </button>
+              </div>
+              <!-- 上传中状态 -->
+              <div v-if="uploading" class="uploading">上传中...</div>
             </div>
           </div>
           <div class="modal-buttons">
@@ -152,9 +163,8 @@
 </template>
 
 <script>
-import { adminApi } from '@/utils/api';
-import { AVAILABLE_IMAGES } from '@/utils/constants';
-import { getImageUrl, getStatusText, showError } from '@/utils/helpers';
+import { adminApi, fileApi } from '@/utils/api';
+import { getImageUrl, getStatusText, showError, showSuccess } from '@/utils/helpers';
 
 export default {
   name: 'Admin',
@@ -166,8 +176,8 @@ export default {
       users: [],
       showAddProductForm: false,
       editingProduct: null,
-      productForm: { name: '', price: 0, stock: 0, imageUrl: '' },
-      imgFiles: AVAILABLE_IMAGES
+      productForm: { name: '', price: 0, stock: 0, imgUrl: '' },
+      uploading: false
     }
   },
   async created() {
@@ -202,27 +212,67 @@ export default {
       this.editingProduct = product
       this.productForm = { 
         ...product,
-        imageUrl: product.imgUrl || '' 
+        imgUrl: product.imgUrl || '' 
       }
       this.showAddProductForm = true
     },
     
-    selectImage(imgFileName) {
-      this.productForm.imageUrl = imgFileName
-      this.productForm.imgUrl = imgFileName
+    async handleFileChange(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      // 检查文件类型
+      if (!file.type.startsWith('image/')) {
+        showError({ message: '请选择图片文件' })
+        return
+      }
+
+      // 检查文件大小（5MB）
+      if (file.size > 5 * 1024 * 1024) {
+        showError({ message: '图片大小不能超过 5MB' })
+        return
+      }
+
+      try {
+        this.uploading = true
+        const res = await fileApi.upload(file)
+        this.productForm.imgUrl = res.data.data
+        showSuccess('图片上传成功')
+      } catch (err) {
+        showError(err, '图片上传失败')
+      } finally {
+        this.uploading = false
+        // 重置文件输入
+        if (this.$refs.fileInput) {
+          this.$refs.fileInput.value = ''
+        }
+      }
+    },
+    
+    removeImage() {
+      this.productForm.imgUrl = ''
     },
     
     async saveProduct() {
       try {
+        // 准备要发送的数据，确保使用 imgUrl 字段
+        const productData = {
+          name: this.productForm.name,
+          price: this.productForm.price,
+          stock: this.productForm.stock,
+          imgUrl: this.productForm.imgUrl || ''
+        }
+        
         if (this.editingProduct) {
-          await adminApi.updateProduct(this.editingProduct.id, this.productForm)
+          await adminApi.updateProduct(this.editingProduct.id, productData)
         } else {
-          await adminApi.createProduct(this.productForm)
+          await adminApi.createProduct(productData)
         }
         this.showAddProductForm = false
         this.editingProduct = null
-        this.productForm = { name: '', price: 0, stock: 0, imageUrl: '' }
+        this.productForm = { name: '', price: 0, stock: 0, imgUrl: '' }
         await this.fetchProducts()
+        showSuccess('商品保存成功')
       } catch (err) {
         showError(err, '保存商品失败')
       }
@@ -449,41 +499,91 @@ button:hover {
   margin-bottom: 15px;
 }
 
-.image-selector {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.image-option {
-  cursor: pointer;
-  padding: 5px;
-  border: 2px solid transparent;
-  border-radius: 4px;
+.image-upload {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 20px;
   text-align: center;
-  transition: all 0.2s;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
 }
 
-.image-option:hover {
+.image-upload:hover {
   border-color: #4CAF50;
   background-color: #f5f5f5;
 }
 
-.image-option.selected {
-  border-color: #4CAF50;
-  background-color: #e8f5e9;
+.image-preview {
+  position: relative;
+  display: inline-block;
 }
 
-.image-option span {
-  font-size: 10px;
-  display: block;
-  margin-top: 5px;
-  word-break: break-all;
+.image-preview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.remove-image {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.remove-image:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+.upload-placeholder {
+  padding: 30px;
+}
+
+.upload-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 40px;
+  background: linear-gradient(135deg, #4CAF50, #66BB6A);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.upload-btn:hover {
+  background: linear-gradient(135deg, #45a049, #4CAF50);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.upload-icon {
+  font-size: 32px;
+}
+
+.uploading {
+  margin-top: 10px;
+  color: #4CAF50;
+  font-weight: 500;
 }
 
 .form-group label {

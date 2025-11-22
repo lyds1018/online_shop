@@ -1,6 +1,11 @@
 package com.shop.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 
 @Entity                                             // 产品实体类，对应数据库中的 product 表
 public class Product {
@@ -19,7 +24,7 @@ public class Product {
     private Integer stock;                          // 库存数量
 
     @Lob
-    private String img_url;                     // 商品图片URL  
+    private String imgUrl;                     // 商品图片URL  
 
     // ===== Getter / Setter 方法 =====
 
@@ -35,8 +40,8 @@ public class Product {
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
 
-    public String getImgUrl() { return img_url; }
-    public void setImgUrl(String imgUrl) { this.img_url = imgUrl; }
+    public String getImgUrl() { return imgUrl; }
+    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
 }
 
 

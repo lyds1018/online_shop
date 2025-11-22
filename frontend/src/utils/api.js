@@ -83,4 +83,26 @@ export const adminApi = {
   deleteUser: (id) => apiClient.delete(`/api/admin/users/${id}`)
 }
 
+// 文件上传相关 API
+export const fileApi = {
+  upload: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post('/api/files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  getImageUrl: (filename) => {
+    if (!filename) return null
+    // 如果已经是完整URL，直接返回
+    if (filename.startsWith('http://') || filename.startsWith('https://') || filename.startsWith('/api/')) {
+      return `http://localhost:8080${filename.startsWith('/') ? filename : '/' + filename}`
+    }
+    // 否则拼接完整路径
+    return `http://localhost:8080/api/files/images/${filename}`
+  }
+}
+
 export default apiClient
