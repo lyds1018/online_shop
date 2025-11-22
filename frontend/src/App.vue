@@ -90,10 +90,11 @@ export default {
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f8f9fa;
+  color: #2c3e50;
+  background: linear-gradient(135deg, #f0f4f8 0%, #e8f1f8 100%);
+  min-height: 100vh;
 }
 
 /* 导航栏样式优化 */
@@ -101,13 +102,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  padding: 18px 40px;
+  background: linear-gradient(135deg, #3498db, #64b5f6);
   color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
   position: sticky;
   top: 0;
   z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
 .nav-brand {

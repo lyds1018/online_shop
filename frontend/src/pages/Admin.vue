@@ -344,8 +344,9 @@ export default {
 }
 
 .sidebar button.active {
-  background-color: #4CAF50;
+  background: linear-gradient(135deg, #3498db, #64b5f6);
   color: white;
+  box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
 }
 
 /* 内容区域 */
@@ -382,40 +383,59 @@ tr:hover {
 
 /* 按钮样式 */
 .add-button {
-  background-color: #4CAF50;
+  background: linear-gradient(135deg, #3498db, #64b5f6);
   color: white;
   padding: 10px 20px;
-  border-radius: 4px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   margin-bottom: 10px;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
 }
 
 .add-button:hover {
-  background-color: #45a049;
+  background: linear-gradient(135deg, #2980b9, #42a5f5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
 }
 
 .delete-button {
-  background-color: #ff4444;
+  background: linear-gradient(135deg, #e74c3c, #ff7675);
   color: white;
   padding: 5px 12px;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
 }
 
 .delete-button:hover {
-  background-color: #e53935;
+  background: linear-gradient(135deg, #c0392b, #e17055);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(231, 76, 60, 0.4);
 }
 
 button {
-  padding: 5px 10px;
+  padding: 8px 16px;
   margin: 0 5px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  background: linear-gradient(135deg, #64b5f6, #90caf9);
+  color: white;
+  box-shadow: 0 2px 8px rgba(100, 181, 246, 0.3);
+}
+
+button:hover {
+  background: linear-gradient(135deg, #42a5f5, #64b5f6);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(100, 181, 246, 0.4);
 }
 
 /* 弹窗样式 */
@@ -496,6 +516,15 @@ button {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  transform: translateY(-1px);
 }
 
 .modal-buttons {

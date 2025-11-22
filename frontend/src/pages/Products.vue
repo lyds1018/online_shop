@@ -154,7 +154,7 @@ export default {
 
 .search-bar input:focus {
   border-color: #3498db;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
   transform: translateY(-1px);
 }
 
@@ -195,7 +195,7 @@ export default {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
+  background: linear-gradient(90deg, #3498db, #64b5f6);
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -285,7 +285,7 @@ export default {
 
 /* 按钮样式优化 */
 button {
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: linear-gradient(135deg, #3498db, #64b5f6);
   color: #fff;
   border: none;
   padding: 12px 24px;
@@ -296,7 +296,7 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -322,8 +322,8 @@ button:hover::before {
 
 button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
-  background: linear-gradient(135deg, #219a52, #27ae60);
+  box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+  background: linear-gradient(135deg, #2980b9, #42a5f5);
 }
 
 button:active:not(:disabled) {

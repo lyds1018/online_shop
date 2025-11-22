@@ -25,11 +25,24 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: #4CAF50;
-  color: #fff;
-  border-radius: 6px;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  color: #333;
+  border-radius: 8px;
   margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.navbar:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3498db;
+  text-decoration: none;
 }
 
 .nav-links {

@@ -2,11 +2,11 @@
   <div class="login-container">
     <h2>登录</h2>
     <form @submit.prevent="handleSubmit">
-      <div class="form-group" data-icon="👤">
+      <div class="form-group">
         <label>用户名：</label>
         <input type="text" v-model="username" placeholder="请输入用户名" required />
       </div>
-      <div class="form-group" data-icon="🔒">
+      <div class="form-group">
         <label>密码：</label>
         <input type="password" v-model="password" placeholder="请输入密码" required />
       </div>
@@ -82,7 +82,7 @@ export default {
   left: 0;
   width: 100%;
   height: 6px;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
+  background: linear-gradient(90deg, #3498db, #64b5f6);
 }
 
 /* 标题样式 */
@@ -103,7 +103,7 @@ export default {
   transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
+  background: linear-gradient(90deg, #3498db, #64b5f6);
   border-radius: 3px;
 }
 
@@ -145,6 +145,7 @@ input:focus {
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
   background: white;
+  transform: translateY(-1px);
 }
 
 input::placeholder {
@@ -152,28 +153,13 @@ input::placeholder {
   font-size: 14px;
 }
 
-/* 输入框图标容器 */
-.form-group::after {
-  content: attr(data-icon);
-  position: absolute;
-  right: 20px;
-  top: 70%;
-  transform: translateY(-50%);
-  color: #95a5a6;
-  font-size: 18px;
-  pointer-events: none;
-  transition: color 0.3s ease;
-}
-
-.form-group:focus-within::after {
-  color: #3498db;
-}
+/* 移除输入框图标 */
 
 /* 按钮样式 */
 button {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #3498db, #2ecc71);
+  background: linear-gradient(135deg, #3498db, #64b5f6);
   color: white;
   border: none;
   border-radius: 8px;
