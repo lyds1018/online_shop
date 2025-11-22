@@ -19,7 +19,7 @@ public class Product {
     private Integer stock;                          // 库存数量
 
     @Lob
-    private String imgUrl;                     // 商品图片URL
+    private String img_url;                     // 商品图片URL  
 
     // ===== Getter / Setter 方法 =====
 
@@ -35,8 +35,8 @@ public class Product {
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
 
-    public String getImgUrl() { return imgUrl; }
-    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
+    public String getImgUrl() { return img_url; }
+    public void setImgUrl(String imgUrl) { this.img_url = imgUrl; }
 }
 
 
