@@ -4,8 +4,8 @@
     <nav class="navbar" v-if="isLoggedIn && $route.meta.showNavbar !== false">
       <div class="nav-brand">在线商城</div>
       <div class="nav-links">
-        <!-- 对于root用户，只显示后台管理 -->
-        <a href="#" @click.prevent="goAdmin" v-if="username == 'root'">后台管理</a>
+        <!-- 对于root用户，只显示后台管理，但在admin页面时不显示 -->
+        <a href="#" @click.prevent="goAdmin" v-if="username == 'root' && $route.path !== '/admin'">后台管理</a>
         
         <!-- 对于非root用户，显示商品、购物车、我的订单 -->
         <router-link to="/products" v-if="username !== 'root'">商品</router-link>
