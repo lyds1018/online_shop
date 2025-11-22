@@ -125,10 +125,7 @@
             <label>库存：</label>
             <input type="number" v-model="productForm.stock" min="0" required />
           </div>
-          <div class="form-group">
-            <label>描述：</label>
-            <textarea v-model="productForm.description"></textarea>
-          </div>
+
           <div class="form-group">
             <label>商品图片：</label>
             <div class="image-selector">
@@ -167,7 +164,7 @@ export default {
       users: [],
       showAddProductForm: false,
       editingProduct: null,
-      productForm: { name: '', price: 0, stock: 0, description: '', imageUrl: '' },
+      productForm: { name: '', price: 0, stock: 0, imageUrl: '' },
       imgFiles: [
         '00a5036a-07d3-4131-b677-956312bbbc2c.jpg',
         '0a91f05d-948b-48d4-aac5-5cbd2e85238f.jpg',
@@ -243,7 +240,7 @@ export default {
         }
         this.showAddProductForm = false
         this.editingProduct = null
-        this.productForm = { name: '', price: 0, stock: 0, description: '', imageUrl: '' }
+        this.productForm = { name: '', price: 0, stock: 0, imageUrl: '' }
         await this.fetchProducts()
       } catch (err) { alert('保存商品失败：' + err.message) }
     },
