@@ -104,13 +104,15 @@ public class AdminController {
     }
 
     /**
-     * 查询所有用户
+     * 查询所有用户(不包括管理员)
      *
      * @return 用户列表
      */
     @GetMapping("/users")
     public ResponseDTO<List<User>> listUsers() {
-        return ResponseDTO.ok(userRepository.findAll());
+        return ResponseDTO.ok(userRepository.findAll().stream()
+                .filter(user -> !"ADMIN".equals(user.getRole()))
+                .toList());
     }
 
     /**
