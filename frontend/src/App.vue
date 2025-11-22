@@ -23,13 +23,17 @@
 </template>
 
 <script>
+import { USER_ROLES } from '@/utils/constants';
+import { clearUserInfo, getUserInfo, saveUserInfo } from '@/utils/helpers';
+
 export default {
   name: 'App',
   data() {
+    const userInfo = getUserInfo()
     return {
-      token: null,
-      userRole: null,
-      username: null // 添加用户名数据属性
+      token: userInfo.token,
+      userRole: userInfo.userRole,
+      username: userInfo.username
     }
   },
   computed: {
@@ -37,15 +41,10 @@ export default {
       return !!this.token
     },
     isAdmin() {
-      return this.userRole === 'ADMIN'
+      return this.userRole === USER_ROLES.ADMIN
     }
   },
   created() {
-    // 页面加载时从 localStorage 初始化登录状态
-    this.token = localStorage.getItem('token')
-    this.userRole = localStorage.getItem('userRole')
-    this.username = localStorage.getItem('username') // 从localStorage获取用户名
-
     // 如果 token 不存在且不是登录页/注册页，自动跳回登录页
     if (!this.token && !['/login', '/register'].includes(this.$route.path)) {
       this.$router.replace('/login')
@@ -63,19 +62,15 @@ export default {
       this.token = null
       this.userRole = null
       this.username = null
-      localStorage.removeItem('token')
-      localStorage.removeItem('userRole')
-      localStorage.removeItem('username')
+      clearUserInfo()
       this.$router.push('/login')
     },
-    setLogin(token, role, username) { // 添加username参数
+    setLogin(token, role, username) {
       this.token = token
       this.userRole = role
       this.username = username
-      localStorage.setItem('token', token)
-      localStorage.setItem('userRole', role)
-      localStorage.setItem('username', username) // 存储用户名
-      this.$router.push('/products') // 登录成功后跳转到商品页
+      saveUserInfo(token, role, username)
+      this.$router.push('/products')
     }
   }
 }

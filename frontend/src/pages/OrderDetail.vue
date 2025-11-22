@@ -51,7 +51,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { orderApi } from '@/utils/api';
+import { formatDate, getStatusText, showError, showSuccess } from '@/utils/helpers';
 
 export default {
   name: 'OrderDetail',
@@ -64,65 +65,46 @@ export default {
     await this.fetchOrderDetail()
   },
   methods: {
+    formatDate,
+    getStatusText,
+    
     async fetchOrderDetail() {
       try {
-        const token = localStorage.getItem('token')
         const orderId = this.$route.params.id
-        const response = await axios.get(`/api/orders/${orderId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await orderApi.getById(orderId)
         this.order = response.data.data
       } catch (error) {
-        alert('获取订单详情失败：' + error.message)
+        showError(error, '获取订单详情失败')
       }
     },
-    formatDate(date) {
-      return new Date(date).toLocaleString()
-    },
-    getStatusText(status) {
-      const map = {
-        PENDING: '待支付',
-        PAID: '已支付',
-        SHIPPING: '已发货',
-        COMPLETED: '已完成',
-        CANCELLED: '已取消'
-      }
-      return map[status] || status
-    },
+    
     async pay() {
       try {
-        const token = localStorage.getItem('token')
-        await axios.post('/api/orders/pay', { orderId: this.order.id }, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await orderApi.pay(this.order.id)
         await this.fetchOrderDetail()
-        alert('支付成功')
+        showSuccess('支付成功')
       } catch (error) {
-        alert('支付失败：' + error.message)
+        showError(error, '支付失败')
       }
     },
+    
     async cancel() {
       try {
-        const token = localStorage.getItem('token')
-        await axios.put(`/api/orders/${this.order.id}/cancel`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await orderApi.cancel(this.order.id)
         await this.fetchOrderDetail()
-        alert('订单已取消')
+        showSuccess('订单已取消')
       } catch (error) {
-        alert('取消失败：' + error.message)
+        showError(error, '取消失败')
       }
     },
+    
     async complete() {
       try {
-        const token = localStorage.getItem('token')
-        await axios.put(`/api/orders/${this.order.id}/complete`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await orderApi.complete(this.order.id)
         await this.fetchOrderDetail()
-        alert('确认收货成功')
+        showSuccess('确认收货成功')
       } catch (error) {
-        alert('操作失败：' + error.message)
+        showError(error, '操作失败')
       }
     }
   }

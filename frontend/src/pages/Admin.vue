@@ -152,7 +152,9 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { adminApi } from '@/utils/api';
+import { AVAILABLE_IMAGES } from '@/utils/constants';
+import { getImageUrl, getStatusText, showError } from '@/utils/helpers';
 
 export default {
   name: 'Admin',
@@ -165,139 +167,114 @@ export default {
       showAddProductForm: false,
       editingProduct: null,
       productForm: { name: '', price: 0, stock: 0, imageUrl: '' },
-      imgFiles: [
-        '00a5036a-07d3-4131-b677-956312bbbc2c.jpg',
-        '0a91f05d-948b-48d4-aac5-5cbd2e85238f.jpg',
-        '0b02244f-6908-4ccb-a9d2-ccb5a462e30e.jpg',
-        '0b1e57bf-b4fd-40df-9832-4749d7d69db9.jpg',
-        '0bc4f5ac-d601-421d-8131-81958a195705.jpg',
-        '0dc503b2-90a2-4971-9723-c085a1844b76.jpg',
-        '0ec8c4a7-aedc-464d-9e23-d3e4acafdc73.jpg',
-        '0f701215-b782-40c7-8bbd-97b51be56461.jpg',
-        '0f724c0f-8888-4b75-8fe1-dc7dd8f2b7bd.jpg',
-        '1aea34fa-f45e-4c3c-b73c-da1f92492c95.jpg',
-        '1c70ddcb-ca69-40ed-a263-30880b2e2cac.jpg',
-        '1ca16211-2b80-4006-ab60-e1a3cab4218c.jpg',
-        '1eefadae-5f62-4abd-b283-077e7b6d9193.jpg',
-        '2d827a7e-fb30-493d-840a-cb21766814fd.jpg',
-        '3b40971a-3f32-45cf-a99a-aada90ee8e33.jpg'
-      ]
+      imgFiles: AVAILABLE_IMAGES
     }
   },
   async created() {
     await this.fetchData()
   },
   methods: {
+    getStatusText,
+    getImageUrl,
+    
     async setView(view) {
       this.currentView = view
       await this.fetchData()
     },
+    
     async fetchData() {
       if (this.currentView === 'products') await this.fetchProducts()
       else if (this.currentView === 'orders') await this.fetchOrders()
       else if (this.currentView === 'users') await this.fetchUsers()
     },
 
-    // 商品
+    // 商品管理
     async fetchProducts() {
       try {
-        const res = await axios.get('/api/admin/products')
+        const res = await adminApi.getProducts()
         this.products = res.data.data
-      } catch (err) { alert('获取商品列表失败：' + err.message) }
+      } catch (err) {
+        showError(err, '获取商品列表失败')
+      }
     },
+    
     editProduct(product) {
       this.editingProduct = product
-      // 设置表单数据
       this.productForm = { 
         ...product,
         imageUrl: product.imgUrl || '' 
       }
       this.showAddProductForm = true
     },
+    
     selectImage(imgFileName) {
-      // 直接设置图片URL
-      this.productForm.imageUrl = imgFileName;
-      // 同时更新imgUrl字段以保持一致性
-      this.productForm.imgUrl = imgFileName;
+      this.productForm.imageUrl = imgFileName
+      this.productForm.imgUrl = imgFileName
     },
     
-    getImageUrl(imgFileName) {
-      try {
-        // 使用require方式加载图片，与Products.vue保持一致
-        return require(`../img/${imgFileName}`);
-      } catch (error) {
-        console.error('图片加载失败:', error);
-        // 备用方案
-        return `/src/img/${imgFileName}`;
-      }
-    },
     async saveProduct() {
       try {
         if (this.editingProduct) {
-          await axios.put(`/api/admin/products/${this.editingProduct.id}`, this.productForm)
+          await adminApi.updateProduct(this.editingProduct.id, this.productForm)
         } else {
-          await axios.post('/api/admin/products', this.productForm)
+          await adminApi.createProduct(this.productForm)
         }
         this.showAddProductForm = false
         this.editingProduct = null
         this.productForm = { name: '', price: 0, stock: 0, imageUrl: '' }
         await this.fetchProducts()
-      } catch (err) { alert('保存商品失败：' + err.message) }
+      } catch (err) {
+        showError(err, '保存商品失败')
+      }
     },
+    
     async deleteProduct(id) {
       if (!confirm('确定要删除这个商品吗？')) return
       try {
-        await axios.delete(`/api/admin/products/${id}`)
+        await adminApi.deleteProduct(id)
         await this.fetchProducts()
-      } catch (err) { alert('删除商品失败：' + err.message) }
+      } catch (err) {
+        showError(err, '删除商品失败')
+      }
     },
 
-    // 订单
+    // 订单管理
     async fetchOrders() {
       try {
-        const res = await axios.get('/api/admin/orders')
+        const res = await adminApi.getOrders()
         this.orders = res.data.data
-      } catch (err) { alert('获取订单列表失败：' + err.message) }
-    },
-    async shipOrder(orderId) {
-      try {
-        await axios.post(`/api/admin/orders/${orderId}/ship`)
-        await this.fetchOrders()
-      } catch (err) { alert('发货失败：' + err.message) }
+      } catch (err) {
+        showError(err, '获取订单列表失败')
+      }
     },
     
-    async deleteOrder(orderId) {
-      if (!confirm('确定要删除该订单吗？此操作不可恢复。')) return
+    async shipOrder(orderId) {
       try {
-        await axios.delete(`/api/admin/orders/${orderId}`)
+        await adminApi.shipOrder(orderId)
         await this.fetchOrders()
-      } catch (err) { alert('删除订单失败：' + err.message) }
+      } catch (err) {
+        showError(err, '发货失败')
+      }
     },
 
-    // 用户
+    // 用户管理
     async fetchUsers() {
       try {
-        const res = await axios.get('/api/admin/users')
+        const res = await adminApi.getUsers()
         this.users = res.data.data
-      } catch (err) { alert('获取用户列表失败：' + err.message) }
+      } catch (err) {
+        showError(err, '获取用户列表失败')
+      }
     },
+    
     async deleteUser(userId) {
       if (!confirm('确定要删除这个用户吗？')) return
       try {
-        await axios.delete(`/api/admin/users/${userId}`)
+        await adminApi.deleteUser(userId)
         await this.fetchUsers()
-      } catch (err) { alert('删除用户失败：' + err.message) }
-    },
-
-    getStatusText(status) {
-      const map = {
-        PENDING: '待支付',
-        PAID: '已支付',
-        SHIPPING: '已发货',
-        COMPLETED: '已完成',
-        CANCELLED: '已取消'
+      } catch (err) {
+        showError(err, '删除用户失败')
       }
-      return map[status] || status
     }
   }
 }

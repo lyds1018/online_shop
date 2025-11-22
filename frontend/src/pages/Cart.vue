@@ -48,17 +48,16 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { cartApi, orderApi } from '@/utils/api';
+import { showError } from '@/utils/helpers';
 
 export default {
   name: 'Cart',
-
   data() {
     return {
       items: []
     }
   },
-
   computed: {
     total() {
       return this.items
@@ -66,46 +65,45 @@ export default {
         .toFixed(2)
     }
   },
-
   async created() {
-    this.loadCart()
+    await this.loadCart()
   },
-
   methods: {
     async loadCart() {
       try {
-        const res = await axios.get('/api/cart')
+        const res = await cartApi.get()
         this.items = res.data.data
       } catch (err) {
-        alert('获取购物车失败：' + (err.response?.data?.message || err.message))
+        showError(err, '获取购物车失败')
       }
     },
 
     async changeQty(item, qty) {
       try {
-        await axios.put(`/api/cart/items/${item.id}`, { quantity: qty })
-        this.loadCart()
+        await cartApi.updateItem(item.id, qty)
+        await this.loadCart()
       } catch (err) {
-        alert('更新数量失败：' + (err.response?.data?.message || err.message))
+        showError(err, '更新数量失败')
       }
     },
 
     async removeItem(id) {
       if (!confirm('确定删除该商品吗？')) return
+      
       try {
-        await axios.delete(`/api/cart/items/${id}`)
-        this.loadCart()
+        await cartApi.removeItem(id)
+        await this.loadCart()
       } catch (err) {
-        alert('删除失败：' + (err.response?.data?.message || err.message))
+        showError(err, '删除失败')
       }
     },
 
     async checkout() {
       try {
-        const res = await axios.post('/api/orders/create')
+        const res = await orderApi.create()
         this.$router.push(`/orders/${res.data.data.id}`)
       } catch (err) {
-        alert('创建订单失败：' + (err.response?.data?.message || err.message))
+        showError(err, '创建订单失败')
       }
     }
   }

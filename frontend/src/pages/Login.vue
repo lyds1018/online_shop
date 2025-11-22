@@ -19,7 +19,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { userApi } from '@/utils/api';
+import { showError } from '@/utils/helpers';
 
 export default {
   name: 'Login',
@@ -32,13 +33,13 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        const response = await axios.post('/api/users/login', {
+        const response = await userApi.login({
           username: this.username,
           password: this.password
         })
+        
         if (response.data.success) {
           const payload = response.data.data || {}
-          // 调用父组件方法保存 token、role 和 username
           this.$root.setLogin(payload.token, payload.role, this.username)
 
           if (payload.role === 'ADMIN') {
@@ -48,7 +49,7 @@ export default {
           }
         }
       } catch (error) {
-        alert('登录失败：' + error.message)
+        showError(error, '登录失败')
       }
     }
   }

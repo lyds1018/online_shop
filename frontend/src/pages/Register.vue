@@ -27,7 +27,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { userApi } from '@/utils/api';
+import { showError, showSuccess } from '@/utils/helpers';
 
 export default {
   name: 'Register',
@@ -46,19 +47,19 @@ export default {
       }
 
       try {
-        const res = await axios.post('/api/users/register', {
+        const res = await userApi.register({
           username: this.username,
           password: this.password
         })
 
         if (res.data.success) {
-          alert('注册成功！')
+          showSuccess('注册成功！')
           this.$router.push('/login')
         } else {
           alert(res.data.message || '注册失败')
         }
       } catch (err) {
-        alert('注册失败：' + (err.response?.data?.message || err.message))
+        showError(err, '注册失败')
       }
     }
   }

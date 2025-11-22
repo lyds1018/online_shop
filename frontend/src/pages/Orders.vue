@@ -50,7 +50,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { orderApi } from '@/utils/api';
+import { getStatusText, showError, showSuccess } from '@/utils/helpers';
 
 export default {
   name: 'Orders',
@@ -63,61 +64,44 @@ export default {
     await this.fetchOrders()
   },
   methods: {
+    getStatusText,
+    
     async fetchOrders() {
       try {
-        const token = localStorage.getItem('token')
-        const response = await axios.get('/api/orders', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await orderApi.getAll()
         this.orders = response.data.data
       } catch (error) {
-        alert('获取订单失败：' + error.message)
+        showError(error, '获取订单失败')
       }
     },
-    getStatusText(status) {
-      const map = {
-        PENDING: '待支付',
-        PAID: '已支付',
-        SHIPPING: '已发货',
-        COMPLETED: '已完成',
-        CANCELLED: '已取消'
-      }
-      return map[status] || status
-    },
+    
     async pay(orderId) {
       try {
-        const token = localStorage.getItem('token')
-        await axios.post('/api/orders/pay', { orderId }, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await orderApi.pay(orderId)
         await this.fetchOrders()
-        alert('支付成功')
+        showSuccess('支付成功')
       } catch (error) {
-        alert('支付失败：' + error.message)
+        showError(error, '支付失败')
       }
     },
+    
     async cancel(orderId) {
       try {
-        const token = localStorage.getItem('token')
-        await axios.put(`/api/orders/${orderId}/cancel`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await orderApi.cancel(orderId)
         await this.fetchOrders()
-        alert('订单已取消')
+        showSuccess('订单已取消')
       } catch (error) {
-        alert('取消失败：' + error.message)
+        showError(error, '取消失败')
       }
     },
+    
     async complete(orderId) {
       try {
-        const token = localStorage.getItem('token')
-        await axios.put(`/api/orders/${orderId}/complete`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await orderApi.complete(orderId)
         await this.fetchOrders()
-        alert('确认收货成功')
+        showSuccess('确认收货成功')
       } catch (error) {
-        alert('操作失败：' + error.message)
+        showError(error, '操作失败')
       }
     }
   }

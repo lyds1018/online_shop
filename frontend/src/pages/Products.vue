@@ -35,67 +35,35 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { cartApi, productApi } from '@/utils/api';
+import { debounce, getImageUrl, showError, showSuccess } from '@/utils/helpers';
 
 export default {
   name: 'Products',
-
   data() {
     return {
       products: [],
-      searchQuery: '',
-      searchTimer: null
+      searchQuery: ''
     }
   },
-
   async created() {
-    await this.fetchProducts();
-    // 添加延迟以确保数据已加载
-    setTimeout(() => {
-      this.logProducts();
-    }, 500);
+    await this.fetchProducts()
   },
-
   methods: {
-    // 不再需要从描述中提取图片名称，直接使用imgUrl字段
-    // 保留getImageUrl方法以确保图片显示逻辑一致
+    getImageUrl,
     
-    
-    // 获取图片URL
-    getImageUrl(imgFileName) {
-      try {
-        console.log('尝试加载图片:', imgFileName);
-        
-        // 直接返回静态路径，让浏览器尝试加载
-        return `/src/img/${imgFileName}`;
-      } catch (error) {
-        console.error('图片加载失败:', error);
-        return null;
-      }
-    },
-    
-    // 调试方法：打印所有商品信息
-    logProducts() {
-      console.log('所有商品信息:', this.products);
-    },
-    
-    // 基础商品获取
     async fetchProducts() {
       try {
-        const res = await axios.get('/api/products')
+        const res = await productApi.getAll()
         this.products = res.data.data
       } catch (err) {
-        alert('获取商品失败：' + (err.response?.data?.message || err.message))
+        showError(err, '获取商品失败')
       }
     },
 
-    // 关键字搜索 + 节流
-    debouncedSearch() {
-      clearTimeout(this.searchTimer)
-      this.searchTimer = setTimeout(() => {
-        this.searchProducts()
-      }, 400) // 防止输入过快频繁调用
-    },
+    debouncedSearch: debounce(function() {
+      this.searchProducts()
+    }, 400),
 
     async searchProducts() {
       if (!this.searchQuery) {
@@ -104,23 +72,19 @@ export default {
       }
 
       try {
-        const res = await axios.get(`/api/products/search?query=${this.searchQuery}`)
+        const res = await productApi.search(this.searchQuery)
         this.products = res.data.data
       } catch (err) {
-        alert('搜索失败：' + (err.response?.data?.message || err.message))
+        showError(err, '搜索失败')
       }
     },
 
-    // 加入购物车
-    async addToCart(p) {
+    async addToCart(product) {
       try {
-        await axios.post('/api/cart/add', {
-          productId: p.id,
-          quantity: 1
-        })
-        alert('已加入购物车！')
+        await cartApi.add(product.id, 1)
+        showSuccess('已加入购物车！')
       } catch (err) {
-        alert('加入购物车失败：' + (err.response?.data?.message || err.message))
+        showError(err, '加入购物车失败')
       }
     }
   }
