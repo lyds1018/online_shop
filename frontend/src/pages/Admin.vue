@@ -24,7 +24,7 @@
       <!-- 商品管理 -->
       <div v-if="currentView === 'products'" class="products-management">
         <h3>商品管理</h3>
-        <button class="add-button" @click="showAddProductForm = true">添加商品</button>
+        <button class="add-button" @click="openAddProductForm">添加商品</button>
         <table>
           <thead>
             <tr>
@@ -186,6 +186,13 @@ export default {
   methods: {
     getStatusText,
     getImageUrl,
+    
+    // 打开添加商品表单
+    openAddProductForm() {
+      this.editingProduct = null
+      this.productForm = { name: '', price: 0, stock: 0, imgUrl: '' }
+      this.showAddProductForm = true
+    },
     
     async setView(view) {
       this.currentView = view
