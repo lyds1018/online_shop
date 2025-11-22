@@ -387,7 +387,7 @@ tr:hover {
 .delete-button {
   background: linear-gradient(135deg, #e74c3c, #ff7675);
   color: white;
-  padding: 5px 12px;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
