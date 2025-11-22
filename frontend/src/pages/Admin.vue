@@ -552,6 +552,9 @@ button:hover {
 
 .upload-placeholder {
   padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .upload-btn {
