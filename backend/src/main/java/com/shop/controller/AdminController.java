@@ -19,12 +19,12 @@ import com.shop.repository.UserRepository;
 import com.shop.service.OrderService;
 import com.shop.service.ProductService;
 
-@RestController                                    // 后台管理接口控制器
-@RequestMapping("/api/admin")                       // 管理端统一前缀
+@RestController
+@RequestMapping("/api/admin")
 public class AdminController {
-    private final ProductService productService;   // 商品管理服务
-    private final OrderService orderService;       // 订单管理服务
-    private final UserRepository userRepository;   // 用户直接查询/管理
+    private final ProductService productService;
+    private final OrderService orderService;
+    private final UserRepository userRepository;
 
     public AdminController(
             ProductService productService,
@@ -36,57 +36,89 @@ public class AdminController {
         this.userRepository = userRepository;
     }
 
-    // ===================== 商品管理 =====================
-
-    // 查询所有商品（管理员视角）
+    /**
+     * 查询所有商品（管理员视角）
+     *
+     * @return 商品列表
+     */
     @GetMapping("/products")
     public ResponseDTO<List<Product>> listProducts() {
         return ResponseDTO.ok(productService.listAll());
     }
 
-    // 新增商品
+    /**
+     * 新增商品
+     *
+     * @param product 商品信息
+     * @return 创建后的商品
+     */
     @PostMapping("/products")
-    public ResponseDTO<Product> createProduct(@RequestBody Product p) {
-        return ResponseDTO.ok(productService.create(p));
+    public ResponseDTO<Product> createProduct(@RequestBody Product product) {
+        return ResponseDTO.ok(productService.create(product));
     }
 
-    // 更新商品
+    /**
+     * 更新商品
+     *
+     * @param id      商品 ID
+     * @param product 商品信息
+     * @return 更新后的商品
+     */
     @PutMapping("/products/{id}")
-    public ResponseDTO<Product> updateProduct(@PathVariable Long id, @RequestBody Product p) {
-        return ResponseDTO.ok(productService.update(id, p));
+    public ResponseDTO<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
+        return ResponseDTO.ok(productService.update(id, product));
     }
 
-    // 删除商品
+    /**
+     * 删除商品
+     *
+     * @param id 商品 ID
+     * @return 成功响应
+     */
     @DeleteMapping("/products/{id}")
     public ResponseDTO<Void> deleteProduct(@PathVariable Long id) {
         productService.delete(id);
         return ResponseDTO.ok(null);
     }
 
-    // ===================== 订单管理 =====================
-
-    // 查询所有订单（管理员视角）
+    /**
+     * 查询所有订单（管理员视角）
+     *
+     * @return 订单列表
+     */
     @GetMapping("/orders")
     public ResponseDTO<List<Order>> listOrders() {
         return ResponseDTO.ok(orderService.listAllOrders());
     }
 
-    // 管理员发货（将订单状态更新为 SHIPPING）
+    /**
+     * 管理员发货（将订单状态更新为 SHIPPING）
+     *
+     * @param orderId 订单 ID
+     * @return 成功响应
+     */
     @PostMapping("/orders/{orderId}/ship")
     public ResponseDTO<Void> shipOrder(@PathVariable Long orderId) {
         orderService.updateStatus(orderId, "SHIPPING");
         return ResponseDTO.ok(null);
     }
 
-    // ===================== 用户管理 =====================
-
-    // 查询所有用户
+    /**
+     * 查询所有用户
+     *
+     * @return 用户列表
+     */
     @GetMapping("/users")
     public ResponseDTO<List<User>> listUsers() {
         return ResponseDTO.ok(userRepository.findAll());
     }
 
-    // 删除用户
+    /**
+     * 删除用户
+     *
+     * @param userId 用户 ID
+     * @return 成功响应
+     */
     @DeleteMapping("/users/{userId}")
     public ResponseDTO<Void> deleteUser(@PathVariable Long userId) {
         if (!userRepository.existsById(userId)) {

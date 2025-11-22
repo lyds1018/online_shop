@@ -1,18 +1,14 @@
 package com.shop.interceptor;
 
-import com.shop.exception.BusinessException;
-import com.shop.service.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import com.shop.exception.BusinessException;
+import com.shop.service.UserService;
+import com.shop.util.JwtUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 用户认证拦截器
@@ -26,11 +22,11 @@ import java.nio.charset.StandardCharsets;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final UserService userService;
-    private final String jwtSecret;
+    private final JwtUtil jwtUtil;
 
-    public AuthInterceptor(UserService userService, @Value("${app.security.jwt.secret}") String jwtSecret) {
+    public AuthInterceptor(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
-        this.jwtSecret = jwtSecret;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -62,37 +58,30 @@ public class AuthInterceptor implements HandlerInterceptor {
         // -------------------------
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new BusinessException("未登录"); // token 缺失或格式错误
+            throw new BusinessException("未登录");
         }
 
         try {
-            // 使用配置的 secret 构建密钥
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
+            // 去掉 "Bearer " 前缀
+            String jwtToken = token.substring(7);
+            
             // 解析 JWT
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token.substring(7)) // 去掉 "Bearer "
-                    .getBody();
-
-            String username = claims.getSubject();
+            String username = jwtUtil.extractUsername(jwtToken);
+            String role = jwtUtil.extractRole(jwtToken);
 
             // 检查用户是否存在
             if (!userService.existsByUsername(username)) {
                 throw new BusinessException("用户不存在");
             }
 
-            // -------------------------
             // 管理员接口权限校验
-            // -------------------------
-            if (path.startsWith("/api/admin") && !"ADMIN".equals(claims.get("role"))) {
+            if (path.startsWith("/api/admin") && !"ADMIN".equals(role)) {
                 throw new BusinessException("无权访问");
             }
 
             // 将用户名和角色写入 request，供控制器使用
             request.setAttribute("username", username);
-            request.setAttribute("role", claims.get("role"));
+            request.setAttribute("role", role);
             return true;
 
         } catch (Exception e) {
